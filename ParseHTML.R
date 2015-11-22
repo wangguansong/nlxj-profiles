@@ -15,8 +15,9 @@ ParseHTML <- function(filename) {
     if (length(idx) > 0) {
       title <- gsub(".*<title>(.*)</title>", "\\1", line)
     }
-    idx <- grep('<div class=\"rich_media_content[ ]*\" id=\"js_content\">',
-                line)
+    idx <-
+      grep('<div class=\"rich_media_content[ ]*\" id=\"js_content\">',
+           line)
     line <- readLines(con, n=1)
     if (length(idx) == 0) next
     else break

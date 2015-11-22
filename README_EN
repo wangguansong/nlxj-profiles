@@ -1,0 +1,78 @@
+Analysis of NLXJ Dating Profiles
+
+    1 Introduction
+
+NaLan Xingji (NLXJ) is a public account on Wechat. It publishes three
+issues of dating profiles selected from received letters every weekend,
+usually Gentlemen on Friday and Ladies on Saturday and Sunday. There
+are around 15 people on each issue.
+The general format of one profile is:
+    ID: A given sequential number
+    Wechat
+    Age
+    City
+    Vocation: Current employment or job
+    Interest and Hobby
+    Perference: What kind of people you are looking for
+    Briefly Introduce yourself
+    A photo
+The purpose of this project is to parse the HTML and natural languages
+and to mine for any interesting patterns.
+
+
+    2 Data Cleaning
+
+Profiles are written and submitted by individuals. Therefore the
+profiles are not well structured, the identifiers for entries are
+inconsistent, using <br> in place of <p> is common, and some add emojis
+which cause problem of file encoding.
+
+  2.1 Parsing HTML
+The first step is to read and parse HTML files.
+The profiles are written in one extra-long line, contained in a div with
+id "js_content".
+After located the line, split the line into profiles by "-----" (5 or
+more "-"). Discard the last one since it is always an introduction of
+the platform of some advertisement. Keep the first one and paste to the
+top of each profile since it contains the issue ID and gender.
+Then furtherly split the one line of each profile into entries by
+"</p>". Clean the entries a little by deleting html tags and useless
+spaces.
+
+  2.2 Revision of HTML Files
+During the process of parsing entries (discussed later) various problems
+of the HTML files may show up. Each time a problem is dealt with, re-run
+the HTML parsing process. Then iterate the process.
+One solution is to improve the parsing process. For example, by checking
+the Age entries, I found various ways in which the identifier "Age:" is
+written. Add those writtings to identifiers.
+The other solution is to revise the original HTML files. For example,
+by checking the number of entries of profiles, I discovered profiles
+using "<br>" to seperate entries rather than "<p></p>". Since there are
+few cases, I editted the original HTML.
+The result is a list of character vectors, where each vector represents
+one profile.
+
+  2.3 Parsing Identification
+General information such as issue number and gender is in the first item
+of the character vector. The profile ID number is in the second item,
+trailed by a "-".
+
+  2.4 Parsing Wechat
+Find the item of the vector with the chinese of "Wechat". Delete any
+content in brackets.
+
+  2.5 Parsing Age
+It could be actual age or the year of birth. The year could be expressed
+as "19xx" or "xx".
+Actual age is converted to year of birth. The issue 199 is the last
+issue in 2014.
+
+  2.6 Parsing Height
+The best case of height is written as a three digits number with "cm" or
+"CM". It can also be written in the unit of meter, three digits with a
+decimal point. Some also come with a ".5".
+
+  2.7 Parsing City
+
+    3 Analysis
