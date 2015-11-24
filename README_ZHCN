@@ -2,77 +2,64 @@
 
     1 简介
 
-NaLan Xingji (NLXJ) is a public account on Wechat. It publishes three
-issues of dating profiles selected from received letters every weekend,
-usually Gentlemen on Friday and Ladies on Saturday and Sunday. There
-are around 15 people on each issue.
-The general format of one profile is:
-    ID: A given sequential number
-    Wechat
-    Age
-    City
-    Vocation: Current employment or job
-    Interest and Hobby
-    Perference: What kind of people you are looking for
-    Briefly Introduce yourself
-    A photo
-The purpose of this project is to parse the HTML and natural languages
-and to mine for any interesting patterns.
+纳兰性急是一个微信公众号。每周末发布三期交友信息：星期五为男士专场，星期
+六、日为女士专场。每期有大概15个人。
+一般的格式是：
+    编号：一个给定的标记号码
+    微信号
+    年龄
+    身高
+    城市
+    职业
+    兴趣爱好
+    求偶要求
+    一句话介绍自己
+    一张照片
+此项目的目的是解析每个人的信息，寻找任何有趣的东西。
 
 
     2 数据清理
 
-Profiles are written and submitted by individuals. Therefore the
-profiles are not well structured, the identifiers for entries are
-inconsistent, using <br> in place of <p> is common, and some add emojis
-which cause problem of file encoding.
+信息由每个人投递，因此资料的格式混乱，每项的名称标记不一致，有用HTML换行
+<br>而不是<p>排版的，而且一些表情符也会导致读取编码困难。
 
   2.1 解析HTML
-The first step is to read and parse HTML files.
-The profiles are written in one extra-long line, contained in a div with
-id "js_content".
-After located the line, split the line into profiles by "-----" (5 or
-more "-"). Discard the last one since it is always an introduction of
-the platform of some advertisement. Keep the first one and paste to the
-top of each profile since it contains the issue ID and gender.
-Then furtherly split the one line of each profile into entries by
-"</p>". Clean the entries a little by deleting html tags and useless
-spaces.
+第一步是读取和解析HTML文件。
+每期所有人的资料都写在一个很长的HTML行里，被包含在id为“js_content”的div
+中。
+找到此行中，先用”-----“（五个以上的“-”）将此长行分割。最后一个总平台的介
+绍或者广告，故舍弃。第一个是标题，包含了本期的编号以及性别，把此标题复制
+到每一份中。之后进入每一个切割后的文本，进一步用“</p>”切割。清理切割之后
+的文字，删掉HTML的标记以及无用的空格等等。
+得到的结果是一个文本向量（character vector）的列表（list），每个向量包含
+一个人的资料。
 
-  2.2 修改HTML源文件
-During the process of parsing entries (discussed later) various problems
-of the HTML files may show up. Each time a problem is dealt with, re-run
-the HTML parsing process. Then iterate the process.
-One solution is to improve the parsing process. For example, by checking
-the Age entries, I found various ways in which the identifier "Age:" is
-written. Add those writtings to identifiers.
-The other solution is to revise the original HTML files. For example,
-by checking the number of entries of profiles, I discovered profiles
-using "<br>" to seperate entries rather than "<p></p>". Since there are
-few cases, I editted the original HTML.
-The result is a list of character vectors, where each vector represents
-one profile.
+  2.2 修改HTML原文件
+在解析每一项文字的时候（稍后讨论），很多HTML原文件中的问题会被暴露出来。
+每考虑过一个问题，都需要重新读取解析原HTML文件。然后循环这个过程。
+问题的解决方案一是改进解析的方法。例如，在查看年龄时，我发现有很多不同的
+“年龄”的写法（“芳龄”，“年  龄”， 等等）。在解析时加入这些写法。
+另一个解决方案是直接修改原HTML文件。例如，查看每份资料包含的信息数量时，
+我发现有一些资料用“<br>”而不是“<p>”分隔信息。因为这种情况并不很多见，我
+直接修改了原HTML文件。
 
   2.3 解析标记信息
-General information such as issue number and gender is in the first item
-of the character vector. The profile ID number is in the second item,
-trailed by a "-".
+每个向量第一项包含了所在期数和性别。此资料的编号在向量的第二项，附加了一
+个“-”。
 
   2.4 解析微信号
-Find the item of the vector with the chinese of "Wechat". Delete any
-content in brackets.
+查找包含“微信号”（以及其他写法）的项。删除所有括号内的内容。
 
   2.5 解析年龄（出生年）
-It could be actual age or the year of birth. The year could be expressed
-as "19xx" or "xx".
-Actual age is converted to year of birth. The issue 199 is the last
-issue in 2014.
+年龄可能是岁数或者出生年。年份可能被表达为“19xx”或“xx”。
+岁数会被转换为出生年。第199期是2014年的最后一期。
 
   2.6 解析身高
-The best case of height is written as a three digits number with "cm" or
-"CM". It can also be written in the unit of meter, three digits with a
-decimal point. Some also come with a ".5".
+身高在最好的情形下被写为以“cm/CM”为单位的三位数。也可能被写为以米为单位
+的含小数点三位数。有些也含有”.5“（半厘米）。
+========================================================================
+==========================72格尺========================================
 
   2.7 解析城市
 
-    3 Analysis
+    3 分析
